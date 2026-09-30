@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Log In - Movie Magic{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-md-6 col-lg-5">
+    <div class="glass-card p-4 p-md-5">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-danger text-white rounded-circle mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+          <i class="fa-solid fa-user-lock"></i>
+        </div>
+        <h3 class="fw-bold text-white">Welcome Back</h3>
+        <p class="text-muted small">Log in to book tickets and manage your reservations</p>
+      </div>
+
+      <form action="{{ url_for('login', next=request.args.get('next')) }}" method="POST">
+        <div class="mb-3">
+          <label class="form-label text-muted small fw-bold">Username or Email</label>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa-solid fa-user"></i></span>
+            <input type="text" name="username" class="form-control bg-dark border-secondary text-white" placeholder="Enter username or email" required>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label text-muted small fw-bold">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa-solid fa-key"></i></span>
+            <input type="password" name="password" class="form-control bg-dark border-secondary text-white" placeholder="Enter password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary-magic w-100 py-3 fw-bold mb-3">
+          Log In <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i>
+        </button>
+
+        <div class="p-3 rounded-3 bg-dark border border-secondary text-center small text-muted">
+          <strong>Demo Credentials:</strong><br>
+          User: <code>alex_johnson</code> / <code>Password123!</code><br>
+          Admin: <code>admin</code> / <code>AdminPassword123!</code>
+        </div>
+
+        <div class="text-center mt-3 small text-muted">
+          Don't have an account? <a href="{{ url_for('register') }}" class="text-danger fw-bold">Sign up here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

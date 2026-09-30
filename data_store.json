@@ -1,0 +1,142 @@
+{
+  "users": [
+    {
+      "user_id": "USR-1001",
+      "username": "alex_johnson",
+      "email": "alex.johnson@example.com",
+      "password": "Password123!",
+      "role": "user"
+    },
+    {
+      "user_id": "USR-9999",
+      "username": "admin",
+      "email": "admin@moviemagic.com",
+      "password": "AdminPassword123!",
+      "role": "admin"
+    }
+  ],
+  "movies": [
+    {
+      "movie_id": "MOV-101",
+      "title": "Cyberpunk Odyssey",
+      "genre": "Sci-Fi",
+      "language": "English",
+      "duration": "2h 25m",
+      "show_time": "18:30",
+      "available_seats": 38,
+      "total_seats": 60,
+      "location": "New York",
+      "price": 18.5,
+      "rating": "4.9 \u2605",
+      "poster_url": "/static/images/poster_cyberpunk.jpg",
+      "description": "In a sprawling dystopian metropolis, a cybernetically enhanced mercenary embarks on a high-stakes mission across futuristic skylines to uncover a corporate conspiracy.",
+      "is_event": false,
+      "director": "Denis Villeneuve",
+      "cast": "Jessica Chen, Kairo Reed, Marcus Vance"
+    },
+    {
+      "movie_id": "MOV-102",
+      "title": "The Cosmic Mystery",
+      "genre": "Sci-Fi",
+      "language": "English",
+      "duration": "2h 10m",
+      "show_time": "20:00",
+      "available_seats": 35,
+      "total_seats": 50,
+      "location": "Los Angeles",
+      "price": 20.0,
+      "rating": "4.8 \u2605",
+      "poster_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop",
+      "description": "An interstellar exploration crew discovers an ancient alien signal coming from the edge of the solar system, revealing secrets that could reshape human history.",
+      "is_event": false,
+      "director": "Christopher Nolan",
+      "cast": "Matthew Miller, Anne Hathaway, John David"
+    },
+    {
+      "movie_id": "MOV-103",
+      "title": "Kingdom of Legends",
+      "genre": "Fantasy",
+      "language": "English",
+      "duration": "2h 45m",
+      "show_time": "19:15",
+      "available_seats": 28,
+      "total_seats": 60,
+      "location": "Chicago",
+      "price": 16.5,
+      "rating": "4.7 \u2605",
+      "poster_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
+      "description": "A mythical tale of ancient kingdoms, fire-breathing dragons, and an unexpected hero bound by destiny to unite a divided empire.",
+      "is_event": false,
+      "director": "Peter Jackson",
+      "cast": "Elijah Wood, Ian McKellen, Viggo Mortensen"
+    },
+    {
+      "movie_id": "MOV-104",
+      "title": "Starlight Symphony Live",
+      "genre": "Musical",
+      "language": "English",
+      "duration": "3h 00m",
+      "show_time": "21:00",
+      "available_seats": 50,
+      "total_seats": 100,
+      "location": "New York",
+      "price": 35.0,
+      "rating": "5.0 \u2605",
+      "poster_url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop",
+      "description": "An exclusive live orchestra performance featuring legendary soundtracks from timeless cinema blockbusters with light and laser spectacles.",
+      "is_event": true,
+      "director": "Hans Zimmer Production",
+      "cast": "London Philharmonic & Guests"
+    },
+    {
+      "movie_id": "MOV-105",
+      "title": "Shadows of Yesterday",
+      "genre": "Thriller",
+      "language": "English",
+      "duration": "1h 55m",
+      "show_time": "17:45",
+      "available_seats": 18,
+      "total_seats": 45,
+      "location": "San Francisco",
+      "price": 15.0,
+      "rating": "4.6 \u2605",
+      "poster_url": "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=800&auto=format&fit=crop",
+      "description": "A detective haunted by a unsolved case receives mysterious clues that point to a crime committed 20 years ago in his hometown.",
+      "is_event": false,
+      "director": "David Fincher",
+      "cast": "Jake Gyllenhaal, Mark Ruffalo"
+    },
+    {
+      "movie_id": "MOV-106",
+      "title": "Global Tech & Film Summit 2026",
+      "genre": "Event",
+      "language": "English",
+      "duration": "5h 00m",
+      "show_time": "10:00",
+      "available_seats": 85,
+      "total_seats": 150,
+      "location": "San Francisco",
+      "price": 50.0,
+      "rating": "4.9 \u2605",
+      "poster_url": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop",
+      "description": "A premier convergence of tech innovators and visual film creators exploring AI, cloud rendering, and immersive cinema tech.",
+      "is_event": true,
+      "director": "Tech Cinema Org",
+      "cast": "Keynote Speakers & Filmmakers"
+    }
+  ],
+  "bookings": [],
+  "notifications": [
+    {
+      "notification_id": "NOTIF-740EF1",
+      "booking_id": "BK-6AFCCD6A",
+      "user_id": "USR-1001",
+      "recipient_email": "alex.johnson@example.com",
+      "subject": "\ud83c\udfac Ticket Confirmation: Cyberpunk Odyssey [Booking #BK-6AFCCD6A]",
+      "body": "\nHello alex_johnson,\n\nYour movie ticket booking is CONFIRMED! Here are your ticket details:\n\n------------------------------------------------\nMovie / Event : Cyberpunk Odyssey\nBooking ID    : BK-6AFCCD6A\nDate & Time   : 2026-10-01 at 18:30\nLocation      : New York\nSeats Booked  : B3, B4\nTotal Paid    : $37.00\nStatus        : CONFIRMED\n------------------------------------------------\n\nThank you for choosing Movie Magic Cloud Ticket System!\nPresent your Booking ID or QR code at the theater entrance.\n\nBest regards,\nMovie Magic Team (Powered by AWS EC2 & DynamoDB)\n",
+      "status": "SIMULATED_SUCCESS",
+      "aws_sns_message_id": null,
+      "timestamp": "2026-09-30T12:02:21.809468"
+    }
+  ]
+}

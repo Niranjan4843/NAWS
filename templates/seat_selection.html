@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Seats - {{ movie.title }} | Movie Magic{% endblock %}
+
+{% block content %}
+<div class="row gy-4">
+  <!-- SEAT MAP COL -->
+  <div class="col-lg-8">
+    <div class="glass-card p-4 text-center">
+      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <h4 class="fw-bold text-white mb-0">
+          <i class="fa-solid fa-couch text-danger me-2"></i> Select Seats for <span class="text-danger">{{ movie.title }}</span>
+        </h4>
+        <span class="badge bg-dark border border-secondary text-muted">
+          <i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ movie.location }} Theater
+        </span>
+      </div>
+
+      <!-- SCREEN CURVE BAR -->
+      <div class="screen-container">
+        <div class="screen-bar"></div>
+        <div class="screen-text"><i class="fa-solid fa-eye me-1"></i> CINEMA SCREEN THIS WAY</div>
+      </div>
+
+      <!-- LEGEND -->
+      <div class="seat-legend">
+        <div class="legend-item">
+          <div class="legend-box" style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-glass);"></div>
+          <span>Available</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: var(--seat-selected);"></div>
+          <span>Selected</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: rgba(239, 68, 68, 0.3); border: 1px solid rgba(239, 68, 68, 0.5);"></div>
+          <span>Occupied</span>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE SEAT GRID -->
+      <div id="seatGrid" class="seat-grid" data-movie-id="{{ movie.movie_id }}" data-location="{{ movie.location }}" data-unit-price="{{ movie.price }}">
+        {% set rows = ['A', 'B', 'C', 'D', 'E', 'F'] %}
+        {% for row in rows %}
+          <div class="seat-row">
+            <span class="row-label">{{ row }}</span>
+            {% for col in range(1, 9) %}
+              {% set seat_code = row ~ col %}
+              {% set is_occupied = seat_code in occupied_seats %}
+              <div class="seat {% if is_occupied %}occupied{% else %}available{% endif %}" 
+                   data-seat-id="{{ seat_code }}"
+                   title="Seat {{ seat_code }} - ${{ '%.2f'|format(movie.price) }}">
+                {{ col }}
+              </div>
+            {% endfor %}
+            <span class="row-label">{{ row }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING SUMMARY SIDEBAR -->
+  <div class="col-lg-4">
+    <div class="glass-card p-4">
+      <h5 class="fw-bold text-white mb-3 border-bottom border-secondary pb-2">
+        <i class="fa-solid fa-receipt text-warning me-2"></i> Booking Summary
+      </h5>
+
+      <div class="mb-3">
+        <span class="text-muted small">Movie / Event</span>
+        <h6 class="fw-bold text-white mb-0">{{ movie.title }}</h6>
+      </div>
+
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <span class="text-muted small">Showtime</span>
+          <div class="fw-bold text-white">{{ movie.show_time }}</div>
+        </div>
+        <div class="col-6">
+          <span class="text-muted small">Ticket Price</span>
+          <div class="fw-bold text-white">${{ "%.2f"|format(movie.price) }} / seat</div>
+        </div>
+      </div>
+
+      <div class="mb-3 p-3 rounded-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass);">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">Selected Seats (<span id="selectedCount">0</span>)</span>
+          <span id="selectedSeatsList" class="fw-bold text-warning">None</span>
+        </div>
+        <hr class="my-2 border-secondary">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-white">Total Amount</span>
+          <span class="fs-4 fw-bold text-success">$<span id="totalPrice">0.00</span></span>
+        </div>
+      </div>
+
+      <button id="confirmBookingBtn" class="btn btn-primary-magic w-100 py-3 mb-3 fw-bold" disabled>
+        <i class="fa-solid fa-bolt me-2"></i> Confirm & Pay Now
+      </button>
+
+      <div class="p-3 rounded-3 border border-warning" style="background: rgba(255, 183, 3, 0.05);">
+        <div class="d-flex align-items-start gap-2">
+          <i class="fa-solid fa-paper-plane text-warning mt-1"></i>
+          <div>
+            <strong class="text-white small d-block">AWS SNS Notification</strong>
+            <p class="small text-muted mb-0">An instant email confirmation will be sent to <strong>{{ current_user.email }}</strong> immediately upon booking.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

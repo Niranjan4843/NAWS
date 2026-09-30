@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Console - Movie Magic Cloud{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-bold text-white mb-0">
+      <i class="fa-solid fa-user-shield text-warning me-2"></i> System Administrator Control Panel
+    </h2>
+    <p class="text-muted small mb-0">Manage catalog, view cloud bookings, toggle DynamoDB & test SNS notifications</p>
+  </div>
+
+  <form action="{{ url_for('toggle_aws_mode') }}" method="POST">
+    <button type="submit" class="btn {% if is_aws_mode %}btn-warning text-dark{% else %}btn-outline-info{% endif %} fw-bold btn-sm shadow">
+      <i class="fa-solid fa-cloud me-1"></i> Mode: {% if is_aws_mode %}AWS DynamoDB (Active){% else %}Local In-Memory Mode{% endif %}
+    </button>
+  </form>
+</div>
+
+<!-- STATS CARDS -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mb-4">
+  <div class="col">
+    <div class="glass-card p-3 border-danger">
+      <div class="text-muted small">Total Catalog Items</div>
+      <div class="fs-2 fw-bold text-white">{{ movies|length }}</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="glass-card p-3 border-success">
+      <div class="text-muted small">Total Bookings</div>
+      <div class="fs-2 fw-bold text-success">{{ bookings|length }}</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="glass-card p-3 border-warning">
+      <div class="text-muted small">Registered Users</div>
+      <div class="fs-2 fw-bold text-warning">{{ users|length }}</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="glass-card p-3 border-info">
+      <div class="text-muted small">SNS Dispatches</div>
+      <div class="fs-2 fw-bold text-info">{{ notifications|length }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS NAVIGATION -->
+<ul class="nav nav-tabs border-secondary mb-4" id="adminTabs" role="tablist">
+  <li class="nav-item">
+    <button class="nav-link active text-white" id="movies-tab" data-bs-toggle="tab" data-bs-target="#moviesPane">
+      <i class="fa-solid fa-film me-1 text-danger"></i> Movie Catalog ({{ movies|length }})
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link text-white" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookingsPane">
+      <i class="fa-solid fa-receipt me-1 text-success"></i> All Bookings ({{ bookings|length }})
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link text-white" id="sns-tab" data-bs-toggle="tab" data-bs-target="#snsPane">
+      <i class="fa-solid fa-paper-plane me-1 text-warning"></i> SNS Notifications ({{ notifications|length }})
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link text-white" id="add-tab" data-bs-toggle="tab" data-bs-target="#addPane">
+      <i class="fa-solid fa-plus me-1 text-info"></i> Add New Movie/Event
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="adminTabContent">
+
+  <!-- TAB 1: MOVIES CATALOG -->
+  <div class="tab-pane fade show active" id="moviesPane">
+    <div class="glass-card p-3">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Genre</th>
+              <th>Location</th>
+              <th>Showtime</th>
+              <th>Seats</th>
+              <th>Price</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in movies %}
+              <tr>
+                <td class="font-monospace text-warning small">{{ m.movie_id }}</td>
+                <td class="fw-bold">{{ m.title }}</td>
+                <td><span class="badge bg-danger">{{ m.genre }}</span></td>
+                <td>{{ m.location }}</td>
+                <td>{{ m.show_time }}</td>
+                <td><span class="text-success fw-bold">{{ m.available_seats }}</span> / {{ m.total_seats }}</td>
+                <td class="fw-bold">${{ "%.2f"|format(m.price) }}</td>
+                <td>
+                  {% if m.is_event %}
+                    <span class="badge bg-purple" style="background: #8a2be2;">Live Event</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Movie</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: ALL BOOKINGS -->
+  <div class="tab-pane fade" id="bookingsPane">
+    <div class="glass-card p-3">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>User ID</th>
+              <th>Movie</th>
+              <th>Seats</th>
+              <th>Date / Time</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bookings %}
+              <tr>
+                <td class="font-monospace text-warning fw-bold">#{{ b.booking_id }}</td>
+                <td class="small text-muted">{{ b.user_id }}</td>
+                <td class="fw-bold">{{ b.movie_title }}</td>
+                <td class="text-info fw-bold">{{ b.seat_number }}</td>
+                <td class="small">{{ b.booking_date }} @ {{ b.show_time }}</td>
+                <td class="text-success fw-bold">${{ "%.2f"|format(b.total_amount) }}</td>
+                <td><span class="badge {% if b.status == 'CONFIRMED' %}bg-success{% else %}bg-danger{% endif %}">{{ b.status }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: AWS SNS NOTIFICATIONS LOG -->
+  <div class="tab-pane fade" id="snsPane">
+    <div class="glass-card p-3">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Notif ID</th>
+              <th>Booking ID</th>
+              <th>Recipient Email</th>
+              <th>Status</th>
+              <th>AWS Message ID</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for n in notifications %}
+              <tr>
+                <td class="font-monospace text-warning small">{{ n.notification_id }}</td>
+                <td class="font-monospace text-white small">#{{ n.booking_id }}</td>
+                <td class="small">{{ n.recipient_email }}</td>
+                <td><span class="badge bg-success">{{ n.status }}</span></td>
+                <td class="font-monospace small text-muted">{{ n.aws_sns_message_id or 'Simulated Engine' }}</td>
+                <td class="small text-muted">{{ n.timestamp[:19].replace('T', ' ') if n.timestamp else '' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: ADD NEW MOVIE FORM -->
+  <div class="tab-pane fade" id="addPane">
+    <div class="glass-card p-4">
+      <h4 class="fw-bold text-white mb-3"><i class="fa-solid fa-plus-circle text-info me-2"></i> Add Movie or Live Event</h4>
+      <form action="{{ url_for('admin_add_movie') }}" method="POST">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Title</label>
+            <input type="text" name="title" class="form-control bg-dark border-secondary text-white" placeholder="Movie or Event Title" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label text-muted small fw-bold">Genre</label>
+            <select name="genre" class="form-select bg-dark border-secondary text-white">
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Action">Action</option>
+              <option value="Fantasy">Fantasy</option>
+              <option value="Musical">Musical</option>
+              <option value="Thriller">Thriller</option>
+              <option value="Drama">Drama</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Event">Event</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label text-muted small fw-bold">Location City</label>
+            <select name="location" class="form-select bg-dark border-secondary text-white">
+              {% for loc in locations %}
+                <option value="{{ loc }}">{{ loc }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label text-muted small fw-bold">Duration</label>
+            <input type="text" name="duration" class="form-control bg-dark border-secondary text-white" value="2h 15m" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label text-muted small fw-bold">Showtime</label>
+            <input type="text" name="show_time" class="form-control bg-dark border-secondary text-white" value="19:30" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label text-muted small fw-bold">Total Seats</label>
+            <input type="number" name="total_seats" class="form-control bg-dark border-secondary text-white" value="60" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label text-muted small fw-bold">Ticket Price ($)</label>
+            <input type="number" step="0.50" name="price" class="form-control bg-dark border-secondary text-white" value="18.00" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Poster Image URL</label>
+            <input type="text" name="poster_url" class="form-control bg-dark border-secondary text-white" placeholder="https://..." value="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Rating Badge</label>
+            <input type="text" name="rating" class="form-control bg-dark border-secondary text-white" value="4.8 ★">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label text-muted small fw-bold">Description / Synopsis</label>
+            <textarea name="description" class="form-control bg-dark border-secondary text-white" rows="2" placeholder="Brief movie description..."></textarea>
+          </div>
+
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="is_event" id="isEventCheck">
+              <label class="form-check-label text-white" for="isEventCheck">
+                This is a Live Event / Concert (Displays in Live Events section)
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary-magic px-4 py-2">
+              <i class="fa-solid fa-plus me-1"></i> Add Item to Catalog
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

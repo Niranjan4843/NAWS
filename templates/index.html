@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Movies & Live Events | Movie Magic{% endblock %}
+
+{% block content %}
+
+<!-- HERO BANNER -->
+<div class="hero-banner">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="badge bg-danger mb-3 px-3 py-2 text-uppercase font-monospace">Now Showing in {{ selected_location }}</span>
+    <h1 class="hero-title">Experience Cinema Magic in Full Cloud Real-Time</h1>
+    <p class="hero-text">
+      Browse top trending blockbusters & exclusive live events. Select your preferred theater seats with instant seat reservation and real-time AWS SNS confirmation!
+    </p>
+
+    <!-- SEARCH & FILTER FORM -->
+    <form action="{{ url_for('index') }}" method="GET" class="d-flex gap-2">
+      <input type="hidden" name="location" value="{{ selected_location }}">
+      <input type="hidden" name="genre" value="{{ selected_genre }}">
+      <div class="input-group">
+        <span class="input-group-text bg-dark border-secondary text-muted">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+        <input type="text" name="search" class="form-bg-dark form-control bg-dark border-secondary text-white py-2" placeholder="Search by movie title or keyword..." value="{{ search_query }}">
+        <button class="btn btn-primary-magic" type="submit">Search</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- GENRE FILTER BAR -->
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+  <div class="d-flex align-items-center gap-2 overflow-auto py-1">
+    <span class="text-muted small fw-bold text-uppercase me-2"><i class="fa-solid fa-filter me-1"></i> Genres:</span>
+    {% for g in genres %}
+      <a href="{{ url_for('index', location=selected_location, genre=g, search=search_query) }}" 
+         class="btn btn-sm {% if selected_genre == g %}btn-danger fw-bold shadow-sm{% else %}btn-outline-secondary text-white-50{% endif %} rounded-pill px-3">
+        {{ g }}
+      </a>
+    {% endfor %}
+  </div>
+  <div class="text-muted small">
+    Showing movies in <strong class="text-white">{{ selected_location }}</strong>
+  </div>
+</div>
+
+<!-- FEATURED MOVIES GRID -->
+<div class="mb-5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h3 class="fw-bold text-white mb-0">
+      <i class="fa-solid fa-clapperboard text-danger me-2"></i> Featured Movies
+    </h3>
+    <span class="badge bg-dark border border-secondary text-muted">{{ movies|length }} Movies Available</span>
+  </div>
+
+  {% if movies %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for movie in movies %}
+        <div class="col">
+          <div class="glass-card">
+            <div class="movie-poster-wrap">
+              <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop'">
+              <span class="rating-badge"><i class="fa-solid fa-star me-1"></i> {{ movie.rating }}</span>
+              <span class="genre-pill">{{ movie.genre }}</span>
+            </div>
+            <div class="card-body-custom">
+              <h5 class="movie-title">{{ movie.title }}</h5>
+              <div class="movie-meta">
+                <span><i class="fa-regular fa-clock me-1"></i> {{ movie.duration }}</span>
+                <span>•</span>
+                <span><i class="fa-solid fa-globe me-1"></i> {{ movie.language }}</span>
+              </div>
+              <p class="movie-desc">{{ movie.description }}</p>
+
+              <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
+                  <span>Showtime: <strong class="text-white">{{ movie.show_time }}</strong></span>
+                  <span class="{% if movie.available_seats < 10 %}text-warning fw-bold{% else %}text-success{% endif %}">
+                    <i class="fa-solid fa-chair me-1"></i> {{ movie.available_seats }} left
+                  </span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="fw-bold text-white fs-5">${{ "%.2f"|format(movie.price) }}</div>
+                  <a href="{{ url_for('select_seats', movie_id=movie.movie_id) }}" class="btn btn-primary-magic btn-sm">
+                    Book Seats <i class="fa-solid fa-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5 glass-card">
+      <i class="fa-solid fa-film-slash text-muted display-4 mb-3"></i>
+      <h5 class="text-white">No Movies Found</h5>
+      <p class="text-muted">No movies matched your filter criteria in {{ selected_location }}.</p>
+      <a href="{{ url_for('index') }}" class="btn btn-outline-magic mt-2">Reset Filters</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- LIVE EVENTS SECTION (Scenario 3) -->
+{% if live_events %}
+<div class="mb-5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h3 class="fw-bold text-white mb-0">
+      <i class="fa-solid fa-ticket text-warning me-2"></i> Live Events & Concerts
+    </h3>
+    <span class="badge bg-warning text-dark font-monospace fw-bold">Live Experiences</span>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for ev in live_events %}
+      <div class="col">
+        <div class="glass-card p-3 flex-row align-items-center gap-3">
+          <img src="{{ ev.poster_url }}" alt="{{ ev.title }}" style="width: 140px; height: 180px; object-fit: cover; border-radius: 12px;" onerror="this.src='https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop'">
+          <div class="flex-grow-1">
+            <span class="badge bg-purple text-white mb-2" style="background: #8a2be2;">Live Event</span>
+            <h5 class="movie-title mb-1">{{ ev.title }}</h5>
+            <p class="small text-muted mb-2"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ ev.location }} • {{ ev.show_time }}</p>
+            <p class="movie-desc mb-3" style="-webkit-line-clamp: 2;">{{ ev.description }}</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="fw-bold text-warning fs-5">${{ "%.2f"|format(ev.price) }}</span>
+              <a href="{{ url_for('select_seats', movie_id=ev.movie_id) }}" class="btn btn-primary-magic btn-sm">
+                Reserve Seats
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

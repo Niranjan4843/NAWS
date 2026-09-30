@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Confirmation #{{ booking.booking_id }} | Movie Magic{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    
+    <!-- CONFIRMATION HEADER -->
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-3" style="width: 64px; height: 64px; font-size: 2rem;">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h2 class="fw-bold text-white mb-1">Booking Confirmed!</h2>
+      <p class="text-muted">Your tickets have been secured and stored in the cloud database.</p>
+    </div>
+
+    <!-- TICKET CARD -->
+    <div class="ticket-card mb-4">
+      <div class="ticket-header">
+        <div>
+          <span class="badge bg-danger mb-1">CONFIRMED TICKET</span>
+          <h3 class="fw-bold text-white mb-0">{{ booking.movie_title }}</h3>
+        </div>
+        <div class="text-end">
+          <span class="text-muted small">Booking Ref</span>
+          <div class="font-monospace text-warning fw-bold fs-5">#{{ booking.booking_id }}</div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-3">
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small d-block">Location</span>
+          <strong class="text-white"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ booking.location }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small d-block">Date</span>
+          <strong class="text-white"><i class="fa-regular fa-calendar me-1 text-danger"></i> {{ booking.booking_date }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small d-block">Time</span>
+          <strong class="text-white"><i class="fa-regular fa-clock me-1 text-danger"></i> {{ booking.show_time }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small d-block">Seats Booked</span>
+          <strong class="text-warning fs-5"><i class="fa-solid fa-couch me-1"></i> {{ booking.seat_number }}</strong>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-3 mt-3">
+        <div>
+          <span class="text-muted small d-block">Total Paid</span>
+          <span class="fs-4 fw-bold text-success">${{ "%.2f"|format(booking.total_amount) }}</span>
+        </div>
+        <div>
+          <span class="badge bg-dark border border-secondary text-muted px-3 py-2">
+            Status: <span class="text-success fw-bold">{{ booking.status }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- VISUAL BARCODE & QR -->
+      <div class="ticket-barcode">
+        <div class="barcode-lines"></div>
+      </div>
+      <div class="text-center mt-2 font-monospace text-dark small fw-bold">
+        {{ booking.booking_id }}-{{ booking.user_id }}-MAGIC-CLOUD
+      </div>
+    </div>
+
+    <!-- AWS SNS NOTIFICATION DISPATCH AUDIT CARD (Scenario 2) -->
+    <div class="glass-card p-4 mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-3 border-bottom border-secondary pb-2">
+        <h5 class="fw-bold text-white mb-0">
+          <i class="fa-solid fa-paper-plane text-warning me-2"></i> AWS SNS Instant Email Dispatch Status
+        </h5>
+        <span class="aws-pill">AWS SNS Cloud Engine</span>
+      </div>
+
+      {% if notification %}
+        <div class="alert alert-dark border-warning bg-dark text-white mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-success">Status: {{ notification.status }}</span>
+            <span class="small text-muted font-monospace">{{ notification.timestamp }}</span>
+          </div>
+          <p class="mb-1"><strong>To:</strong> {{ notification.recipient_email }}</p>
+          <p class="mb-2"><strong>Subject:</strong> {{ notification.subject }}</p>
+          {% if notification.aws_sns_message_id %}
+            <p class="small text-warning font-monospace mb-0">AWS SNS Message ID: {{ notification.aws_sns_message_id }}</p>
+          {% endif %}
+        </div>
+        <pre class="bg-black text-green p-3 rounded-3 border border-secondary font-monospace small" style="color: #4ade80; max-height: 180px; overflow-y: auto;">
+{{ notification.body }}
+        </pre>
+      {% else %}
+        <p class="text-muted mb-0">AWS SNS Notification dispatched to user email ({{ current_user.email }}).</p>
+      {% endif %}
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="d-flex justify-content-center gap-3">
+      <button onclick="window.print()" class="btn btn-outline-magic">
+        <i class="fa-solid fa-print me-2"></i> Print Ticket
+      </button>
+      <a href="{{ url_for('my_bookings') }}" class="btn btn-primary-magic">
+        <i class="fa-solid fa-ticket me-2"></i> View All My Bookings
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

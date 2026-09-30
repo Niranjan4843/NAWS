@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }} - Movie Magic{% endblock %}
+
+{% block content %}
+<div class="glass-card p-4 p-md-5 mb-5">
+  <div class="row gy-4 align-items-center">
+    <div class="col-md-4 text-center">
+      <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="img-fluid rounded-4 shadow-lg" style="max-height: 480px; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop'">
+    </div>
+    <div class="col-md-8">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge bg-danger px-3 py-2 fs-6">{{ movie.genre }}</span>
+        <span class="badge bg-dark border border-warning text-warning px-3 py-2 fs-6">
+          <i class="fa-solid fa-star me-1"></i> {{ movie.rating }}
+        </span>
+      </div>
+
+      <h1 class="display-5 fw-bold text-white mb-3">{{ movie.title }}</h1>
+
+      <div class="d-flex flex-wrap gap-4 text-muted mb-4 fs-6">
+        <div><i class="fa-regular fa-clock me-1 text-danger"></i> {{ movie.duration }}</div>
+        <div><i class="fa-solid fa-globe me-1 text-danger"></i> {{ movie.language }}</div>
+        <div><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ movie.location }}</div>
+        <div><i class="fa-solid fa-chair me-1 text-success"></i> {{ movie.available_seats }} Seats Available</div>
+      </div>
+
+      <p class="fs-5 text-light mb-4" style="line-height: 1.7;">{{ movie.description }}</p>
+
+      <div class="row g-3 mb-4 text-muted border-top border-bottom border-secondary py-3">
+        <div class="col-sm-6">
+          <strong class="text-white">Director:</strong> {{ movie.director }}
+        </div>
+        <div class="col-sm-6">
+          <strong class="text-white">Cast:</strong> {{ movie.cast }}
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div>
+          <span class="text-muted small d-block">Ticket Price</span>
+          <span class="fs-3 fw-bold text-white">${{ "%.2f"|format(movie.price) }}</span>
+        </div>
+        <a href="{{ url_for('select_seats', movie_id=movie.movie_id) }}" class="btn btn-primary-magic btn-lg px-4">
+          <i class="fa-solid fa-couch me-2"></i> Select Seats & Book
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if similar_movies %}
+<h4 class="fw-bold text-white mb-3"><i class="fa-solid fa-film me-2 text-danger"></i> More in {{ movie.location }}</h4>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  {% for sm in similar_movies %}
+    <div class="col">
+      <div class="glass-card p-3 d-flex gap-3">
+        <img src="{{ sm.poster_url }}" alt="{{ sm.title }}" style="width: 80px; height: 110px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop'">
+        <div>
+          <h6 class="fw-bold text-white mb-1">{{ sm.title }}</h6>
+          <p class="small text-muted mb-2">{{ sm.genre }} • {{ sm.duration }}</p>
+          <a href="{{ url_for('select_seats', movie_id=sm.movie_id) }}" class="btn btn-outline-magic btn-sm py-1 px-2">Book Seats</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
